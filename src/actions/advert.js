@@ -2,11 +2,7 @@ import axios from "axios";
 import { newError } from "./error";
 
 let baseUrl = "";
-// if (process.env.NODE_ENV === "development") {
-//   baseUrl = "http://localhost:4000";
-// } else {
-  baseUrl = "https://shielded-journey-92023.herokuapp.com";
-// }
+baseUrl = "https://shielded-journey-92023.herokuapp.com";
 
 const CREATE_NEW_ADVERT = "CREATE_NEW_ADVERT";
 const FETCH_ALL_ADVERTS = "FETCH_ALL_ADVERTS";
@@ -17,58 +13,58 @@ const TOGGLE_AGENT_CONFIRMATION = "TOGGLE_AGENT_CONFIRMATION";
 const GET_MY_ADVERTS = "GET_MY_ADVERTS";
 const CLEAR_SEARCHED_ADVERTS = "CLEAR_SEARCHED_ADVERTS";
 
-const advertCreateSuccess = advert => ({
+const advertCreateSuccess = (advert) => ({
   type: CREATE_NEW_ADVERT,
   advert: { ...advert.newAdvert },
-  user: { ...advert.user }
+  user: { ...advert.user },
 });
 
-export const createAdvert = data => (dispatch, getState) => {
+export const createAdvert = (data) => (dispatch, getState) => {
   const { userReducer } = getState();
   const { jwt } = userReducer;
   axios.defaults.headers.common["Authorization"] = `Bearer ${jwt}`;
 
   axios
     .post(`${baseUrl}/advert`, {
-      ...data
+      ...data,
     })
-    .then(response => {
+    .then((response) => {
       dispatch(advertCreateSuccess(response.data));
     })
-    .catch(err => dispatch(newError(err.response)));
+    .catch((err) => dispatch(newError(err.response)));
 };
 
-const advertsFetchSuccess = adverts => ({
+const advertsFetchSuccess = (adverts) => ({
   type: FETCH_ALL_ADVERTS,
-  adverts
+  adverts,
 });
 
-export const fetchAdverts = page => dispatch => {
+export const fetchAdverts = (page) => (dispatch) => {
   axios
     .get(`${baseUrl}/advert/all?offset=${page}`)
-    .then(response => {
+    .then((response) => {
       dispatch(advertsFetchSuccess(response));
     })
-    .catch(err => dispatch(newError(err.response)));
+    .catch((err) => dispatch(newError(err.response)));
 };
 
-const advertFetchSuccess = advert => ({
+const advertFetchSuccess = (advert) => ({
   type: FETCH_ONE_ADVERT,
-  advert
+  advert,
 });
 
-export const fetchAdvert = id => dispatch => {
+export const fetchAdvert = (id) => (dispatch) => {
   axios
     .get(`${baseUrl}/advert/${id}`)
-    .then(res => {
+    .then((res) => {
       dispatch(advertFetchSuccess(res.data));
     })
-    .catch(err => dispatch(newError(err.response)));
+    .catch((err) => dispatch(newError(err.response)));
 };
 
-const gotAgencyAgents = agency => ({
+const gotAgencyAgents = (agency) => ({
   type: GET_AGENCY_AGENTS,
-  agency
+  agency,
 });
 
 export const getAgencyAgents = () => (dispatch, getState) => {
@@ -78,15 +74,15 @@ export const getAgencyAgents = () => (dispatch, getState) => {
 
   axios
     .get(`${baseUrl}/agency`)
-    .then(response => {
+    .then((response) => {
       dispatch(gotAgencyAgents(response.data));
     })
-    .catch(err => dispatch(newError(err.response)));
+    .catch((err) => dispatch(newError(err.response)));
 };
 
-const toggleAgentSuccess = agent => ({
+const toggleAgentSuccess = (agent) => ({
   type: TOGGLE_AGENT_CONFIRMATION,
-  agent
+  agent,
 });
 
 export const toggleAgentAcc = (id, action) => (dispatch, getState) => {
@@ -96,15 +92,15 @@ export const toggleAgentAcc = (id, action) => (dispatch, getState) => {
 
   axios
     .get(`${baseUrl}/agency/agent/${id}?action=${action}`)
-    .then(response => {
+    .then((response) => {
       dispatch(toggleAgentSuccess(response.data));
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
-const getMyAdvertsSuccess = adverts => ({
+const getMyAdvertsSuccess = (adverts) => ({
   type: GET_MY_ADVERTS,
-  adverts
+  adverts,
 });
 
 export const getMyAdverts = () => (dispatch, getState) => {
@@ -114,43 +110,39 @@ export const getMyAdverts = () => (dispatch, getState) => {
 
   axios
     .get(`${baseUrl}/advert/myadvert`)
-    .then(response => {
+    .then((response) => {
       dispatch(getMyAdvertsSuccess(response.data));
     })
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 };
 
-const searchedAdvertsFetchSuccess = adverts => ({
+const searchedAdvertsFetchSuccess = (adverts) => ({
   type: FETCH_SEARCHED_ADVERTS,
-  adverts
+  adverts,
 });
 
-export const fetchAdvertsBySearchTerm = (
-  page,
-  searchBy,
-  searchFor,
-  searchObj
-) => dispatch => {
-  let url;
-  if (searchObj) {
-    let { priceFrom, priceTo, forRent, forSale } = searchObj;
-    priceFrom = priceFrom ? `&pricefrom=${priceFrom}` : "";
-    priceTo = priceTo ? `&priceto=${priceTo}` : "";
-    forRent = forRent ? `&forrent=true` : "";
-    forSale = forSale ? `&forsale=true` : "";
+export const fetchAdvertsBySearchTerm =
+  (page, searchBy, searchFor, searchObj) => (dispatch) => {
+    let url;
+    if (searchObj) {
+      let { priceFrom, priceTo, forRent, forSale } = searchObj;
+      priceFrom = priceFrom ? `&pricefrom=${priceFrom}` : "";
+      priceTo = priceTo ? `&priceto=${priceTo}` : "";
+      forRent = forRent ? `&forrent=true` : "";
+      forSale = forSale ? `&forsale=true` : "";
 
-    url = `${baseUrl}/advert/all?${searchBy}=${searchFor}&offset=${page}${priceFrom}${priceTo}${forRent}${forSale}`;
-  } else {
-    url = `${baseUrl}/advert/all?${searchBy}=${searchFor}&offset=${page}`;
-  }
-  axios
-    .get(url)
-    .then(response => {
-      dispatch(searchedAdvertsFetchSuccess(response));
-    })
-    .catch(err => dispatch(newError(err.response)));
-};
+      url = `${baseUrl}/advert/all?${searchBy}=${searchFor}&offset=${page}${priceFrom}${priceTo}${forRent}${forSale}`;
+    } else {
+      url = `${baseUrl}/advert/all?${searchBy}=${searchFor}&offset=${page}`;
+    }
+    axios
+      .get(url)
+      .then((response) => {
+        dispatch(searchedAdvertsFetchSuccess(response));
+      })
+      .catch((err) => dispatch(newError(err.response)));
+  };
 
-export const clearSearchedAdverts = () => dispatch => {
+export const clearSearchedAdverts = () => (dispatch) => {
   dispatch({ type: CLEAR_SEARCHED_ADVERTS });
 };
